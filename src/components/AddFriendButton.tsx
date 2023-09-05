@@ -19,7 +19,7 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
     setError,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(addFriendValidator),
+    resolver: zodResolver(addFriendValidator as any),
   })
 
   const addFriend = async (email: string) => {
