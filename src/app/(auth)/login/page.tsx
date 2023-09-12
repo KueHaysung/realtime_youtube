@@ -1,5 +1,5 @@
-'use client'
-import { FC, useState } from "react";
+"use client";
+import { FC, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import { signIn } from "next-auth/react";
 import { toast } from "react-hot-toast";
@@ -7,18 +7,29 @@ interface pageProps {}
 const Page: FC<pageProps> = ({}) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   async function loginWithGoogle() {
-    setIsLoading(true)
-    try{
-      await signIn('google')
+    setIsLoading(true);
+    try {
+      await signIn("google");
+    } catch {
+      toast.error("Something wrong");
+    } finally {
+      setIsLoading(false);
     }
-    catch {
-    toast.error('Something wrong')
-    }
-    finally{
-      setIsLoading(false)
-    }
-    
   }
+  async function loginWithEmail() {
+    setIsLoading(true);
+    // console.log(GetSearchVal);
+    try {
+      await signIn("email", {
+        email: "1424438786@qq.com",
+      });
+    } catch {
+      toast.error("Something wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <>
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -62,7 +73,16 @@ const Page: FC<pageProps> = ({}) => {
                 fill="#EA4335"
               />
               <path d="M1 1h22v22H1z" fill="none" />
-            </svg>Google 
+            </svg>
+            Google
+          </Button>
+          <Button
+            isLoading={false}
+            type="button"
+            className="max-w-sm mx-auto w-full"
+            onClick={loginWithEmail}
+          >
+            Email
           </Button>
         </div>
       </div>

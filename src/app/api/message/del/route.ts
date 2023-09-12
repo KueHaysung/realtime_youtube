@@ -4,12 +4,14 @@ import { db } from '@/lib/db'
 import { pusherServer } from '@/lib/pusher'
 import { toPusherKey } from '@/lib/utils'
 import { Message, messageValidator } from '@/lib/validations/message'
+import { id } from 'date-fns/locale'
 import { nanoid } from 'nanoid'
 import { getServerSession } from 'next-auth'
+import { ZodSet } from 'zod'
 
 export async function POST(req: Request) {
   try {
-    const { text, chatId }: { text: string; chatId: string } = await req.json()
+    const { text, chatId,time }: { text: string; chatId: string,time:number } = await req.json()
     const session = await getServerSession(authOptions)
 
     if (!session) return new Response('Unauthorized', { status: 401 })
@@ -46,11 +48,12 @@ export async function POST(req: Request) {
       text,
       timestamp,
     }
-
     const message = messageValidator.parse(messageData)
-
+    const message1=(await fetchRedis('zrange',`chat:${chatId}:messages`,0,-1))as string[]
+    const message1Parsed= message1.map((m)=>JSON.parse(m) as Message)
+    const message2=message1Parsed.filter((m)=>m.timestamp==time)
     // notify all connected chat room clients
-    await pusherServer.trigger(toPusherKey(`chat:${chatId}`), 'incoming-message', message)
+    await pusherServer.trigger(toPusherKey(`chat:${chatId}`), 'delete-message', message2)
 
     await pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), 'new_message', {
       ...message,
@@ -59,10 +62,7 @@ export async function POST(req: Request) {
     })
 
     // all valid, send the message
-    await db.zadd(`chat:${chatId}:messages`, {
-      score: timestamp,
-      member: JSON.stringify(message),
-    })
+    await db.zremrangebyscore(`chat:${chatId}:messages`, time-1,time+1)
 
     return new Response('OK')
   } catch (error) {

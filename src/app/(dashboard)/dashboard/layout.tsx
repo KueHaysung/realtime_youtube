@@ -12,6 +12,7 @@ import { getFriendsByUserId } from '@/helpers/get-friends-by-user-id'
 import SideBarChatList from '@/components/SideBarChatList'
 import MobileChatLayout from '@/components/MobileChatLayout'
 import { SidebarOption } from '@/types/typings'
+import AppointmentSideBaroptions from '@/components/AppointmentSideBaroptions'
 
 interface LayoutProps {
   children: ReactNode
@@ -30,6 +31,12 @@ const sidebarOptions: SidebarOption[] = [
     href: '/dashboard/add',
     Icon: 'UserPlus',
   },
+  {
+    id: 2,
+    name: 'Create Game',
+    href: '/dashboard/games/create',
+    Icon: 'UserPlus',
+  },
 ]
 
 const Layout = async ({ children }: LayoutProps) => {
@@ -45,7 +52,12 @@ const Layout = async ({ children }: LayoutProps) => {
       `user:${session.user.id}:incoming_friend_requests`
     )) as User[]
   ).length
-
+  const unseenAppointmentCount = (
+    (await fetchRedis(
+      'smembers',
+      `user:${session.user.id}:incoming_appointment`
+    )) as Appointment[]
+  ).length
   return (
     <div className='w-full flex h-screen'>
       <div className='md:hidden'>
@@ -53,7 +65,7 @@ const Layout = async ({ children }: LayoutProps) => {
           friends={friends}
           session={session}
           sidebarOptions={sidebarOptions}
-          unseenRequestCount={unseenRequestCount}
+          unseenRequestCount={unseenAppointmentCount}
         />
       </div>
 
@@ -87,7 +99,7 @@ const Layout = async ({ children }: LayoutProps) => {
                         href={option.href}
                         className='text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-3 rounded-md p-2 text-sm leading-6 font-semibold'>
                         <span className='text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white'>
-                          <Icon className='h-4 w-4' />
+                          <Icon className='h- w-4' />
                         </span>
 
                         <span className='truncate'>{option.name}</span>
@@ -100,6 +112,12 @@ const Layout = async ({ children }: LayoutProps) => {
                   <FriendRequestSidebarOptions
                     sessionId={session.user.id}
                     initialUnseenRequestCount={unseenRequestCount}
+                  />
+                </li>
+                <li>
+                  <AppointmentSideBaroptions
+                    sessionId={session.user.id}
+                    initialUnseenRequestCount={unseenAppointmentCount}
                   />
                 </li>
               </ul>

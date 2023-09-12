@@ -4,6 +4,18 @@ interface User{
   image:string
   id:string
 }
+interface Appointment{
+  id:string
+  name?:string
+  memberId:string[]
+  startTime:number
+  endTime:number
+  selectedGames:string[]
+  countCeiling:number
+  countFloor:number
+  description:string
+  location:string
+}
 interface Message{
   id:string
   senderId:string
