@@ -1,5 +1,4 @@
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+
 import { notFound } from "next/navigation";
 import { FC } from "react";
 import Image from "next/image";
@@ -8,6 +7,7 @@ import { fetchRedis } from "@/helpers/redis";
 import { messageArrayValidator } from "@/lib/validations/message";
 import Messages from "@/components/Messages";
 import ChatInput from "@/components/ChatInput";
+import getUser from "@/lib/getUser";
 interface pageProps {
   params: {
     chatId: string;
@@ -33,9 +33,8 @@ async function getChatMessages(chatId: string) {
 }
 const page: FC<pageProps> = async ({ params }: pageProps) => {
   const { chatId } = params;
-  const session = await getServerSession(authOptions);
-  if (!session) notFound();
-  const { user } = session;
+  const user=await getUser()
+  if (!user) notFound()
   const [userId1, userId2] = chatId.split("--");
   if (user.id !== userId1 && user.id !== userId2) {
     return notFound();
@@ -73,8 +72,8 @@ const page: FC<pageProps> = async ({ params }: pageProps) => {
       <Messages
         chatId={chatId}
         chatPartner={chatPartner}
-        sessionImg={session.user.image}
-        sessionId={session.user.id}
+        sessionImg={user.image}
+        sessionId={user.id}
         initialMessages={initialMessages}
       />
       <ChatInput chatId={chatId} chatPartner={chatPartner} />

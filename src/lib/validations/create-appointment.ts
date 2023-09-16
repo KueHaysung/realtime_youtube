@@ -14,8 +14,9 @@ export enum Games1 {
 
 export const createAppointmentValidator=z.object({
   
-  startTime:z.date(),
-  endTime:z.date(),
+  startTime:z.date().refine((data)=>data.getTime()>Date.now()),
+  endTime:z.date().refine((data)=>data.getTime()>Date.now()),
+  
   gameType:z.array(z.string()),
   countFloor:z.number().gt(1),
   countCeiling:z.number().lt(21),

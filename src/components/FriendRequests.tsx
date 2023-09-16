@@ -5,6 +5,7 @@ import axios from 'axios'
 import { Check, UserPlus, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FC, useEffect, useState } from 'react'
+import { FaUserFriends } from 'react-icons/fa';
 
 interface FriendRequestsProps {
   incomingFriendRequests: IncomingFriendRequest[]
@@ -71,7 +72,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
       ) : (
         friendRequests.map((request) => (
           <div key={request.senderId} className='flex gap-4 items-center'>
-            <UserPlus className='text-black' />
+            <FaUserFriends className="h- w-4"/>
             <p className='font-medium text-lg'>{request.senderEmail}</p>
             <button
               onClick={() => acceptFriend(request.senderId)}

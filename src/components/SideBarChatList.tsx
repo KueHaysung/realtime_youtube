@@ -2,7 +2,6 @@
 import { FC, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { chatHrefConstructor } from "@/lib/utils";
-import { Session } from "inspector";
 interface SideBarChatListProps {
   friends: User[];
   sessionId: string;

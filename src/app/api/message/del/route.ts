@@ -1,32 +1,28 @@
 import { fetchRedis } from '@/helpers/redis'
-import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
+import getUser from '@/lib/getUser'
 import { pusherServer } from '@/lib/pusher'
 import { toPusherKey } from '@/lib/utils'
 import { Message, messageValidator } from '@/lib/validations/message'
-import { id } from 'date-fns/locale'
 import { nanoid } from 'nanoid'
-import { getServerSession } from 'next-auth'
-import { ZodSet } from 'zod'
 
 export async function POST(req: Request) {
   try {
     const { text, chatId,time }: { text: string; chatId: string,time:number } = await req.json()
-    const session = await getServerSession(authOptions)
-
-    if (!session) return new Response('Unauthorized', { status: 401 })
+    const user=await getUser()
+    if (!user) return new Response('Unauthorized', { status: 401 })
 
     const [userId1, userId2] = chatId.split('--')
 
-    if (session.user.id !== userId1 && session.user.id !== userId2) {
+    if (user.id !== userId1 && user.id !== userId2) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    const friendId = session.user.id === userId1 ? userId2 : userId1
+    const friendId = user.id === userId1 ? userId2 : userId1
 
     const friendList = (await fetchRedis(
       'smembers',
-      `user:${session.user.id}:friends`
+      `user:${user.id}:friends`
     )) as string[]
     const isFriend = friendList.includes(friendId)
 
@@ -36,7 +32,7 @@ export async function POST(req: Request) {
 
     const rawSender = (await fetchRedis(
       'get',
-      `user:${session.user.id}`
+      `user:${user.id}`
     )) as string
     const sender = JSON.parse(rawSender) as User
 
@@ -44,7 +40,7 @@ export async function POST(req: Request) {
 
     const messageData: Message = {
       id: nanoid(),
-      senderId: session.user.id,
+      senderId: user.id,
       text,
       timestamp,
     }

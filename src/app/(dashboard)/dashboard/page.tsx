@@ -1,30 +1,27 @@
 import { getFriendsByUserId } from '@/helpers/get-friends-by-user-id'
 import { fetchRedis } from '@/helpers/redis'
-import { authOptions } from '@/lib/auth'
+import getUser from '@/lib/getUser'
 import { chatHrefConstructor } from '@/lib/utils'
 import { ChevronRight } from 'lucide-react'
-import { getServerSession } from 'next-auth'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 const page = async ({}) => {
-  const session = await getServerSession(authOptions)
-  if (!session) notFound()
+  const user=await getUser()
+  if (!user) notFound()
 
-  const friends = await getFriendsByUserId(session.user.id)
+  const friends = await getFriendsByUserId(user.id)
 
   const friendsWithLastMessage = await Promise.all(
     friends.map(async (friend) => {
-      const [lastMessageRaw] = (await fetchRedis(
+      const lastMessage = (await fetchRedis(
         'zrange',
-        `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`,
+        `chat:${chatHrefConstructor(user.id, friend.id)}:messages`,
         -1,
         -1
-      )) as string[]
-
-      const lastMessage = JSON.parse(lastMessageRaw) as Message
-
+      )) 
+    
       return {
         ...friend,
         lastMessage,
@@ -48,7 +45,7 @@ const page = async ({}) => {
 
             <Link
               href={`/dashboard/chat/${chatHrefConstructor(
-                session.user.id,
+                user.id,
                 friend.id
               )}`}
               className='relative sm:flex'>
@@ -68,7 +65,7 @@ const page = async ({}) => {
                 <h4 className='text-lg font-semibold'>{friend.name}</h4>
                 <p className='mt-1 max-w-md'>
                   <span className='text-zinc-400'>
-                    {friend.lastMessage.senderId === session.user.id
+                    {friend.lastMessage.senderId === user.id
                       ? 'You: '
                       : ''}
                   </span>

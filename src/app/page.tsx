@@ -1,40 +1,31 @@
-import { getFriendsByUserId } from '@/helpers/get-friends-by-user-id'
-import { fetchRedis } from '@/helpers/redis'
-import { authOptions } from '@/lib/auth'
-import { chatHrefConstructor } from '@/lib/utils'
-import { ChevronRight } from 'lucide-react'
-import { getServerSession } from 'next-auth'
-import Image from 'next/image'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
 
-const page = async ({}) => {
-  const session = await getServerSession(authOptions)
-  if (!session) notFound()
+const Page = async ({}) => {
+  // const session = await getServerSession(authOptions)
+  // if (!session) notFound()
 
-  const friends = await getFriendsByUserId(session.user.id)
+  // const friends = await getFriendsByUserId(session.user.id)
 
-  const friendsWithLastMessage = await Promise.all(
-    friends.map(async (friend) => {
-      const [lastMessageRaw] = (await fetchRedis(
-        'zrange',
-        `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`,
-        -1,
-        -1
-      )) as string[]
+  // const friendsWithLastMessage = await Promise.all(
+  //   friends.map(async (friend) => {
+  //     const [lastMessageRaw] = (await fetchRedis(
+  //       'zrange',
+  //       `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`,
+  //       -1,
+  //       -1
+  //     )) as string[]
 
-      const lastMessage = JSON.parse(lastMessageRaw) as Message
+  //     const lastMessage = JSON.parse(lastMessageRaw) as Message
 
-      return {
-        ...friend,
-        lastMessage,
-      }
-    })
-  )
+  //     return {
+  //       ...friend,
+  //       lastMessage,
+  //     }
+  //   })
+  // )
 
   return (
-    <div className='container py-12'>
-      <h1 className='font-bold text-5xl mb-8'>Recent chats</h1>
+    <div className="container py-12">
+      {/* <h1 className='font-bold text-5xl mb-8'>Recent chats</h1>
       {friendsWithLastMessage.length === 0 ? (
         <p className='text-sm text-zinc-500'>Nothing to show here...</p>
       ) : (
@@ -78,9 +69,10 @@ const page = async ({}) => {
             </Link>
           </div>
         ))
-      )}
+      )} */}
+      OK,我是主页 return <div> </div>
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default Page;

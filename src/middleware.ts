@@ -1,45 +1,11 @@
-import { getToken } from "next-auth/jwt";
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
-
-export default withAuth(
-  async function middleware(req) {
-    const pathname = req.nextUrl.pathname;
-    console.log("pathname", pathname);
-    // Manage route protection
-    const isAuth = await getToken({ req });
-    const isLoginPage = pathname.startsWith("/login");
-
-    const sensitiveRoutes = ["/dashboard"];
-    const isAccessingSensitiveRoute = sensitiveRoutes.some((route) =>
-      pathname.startsWith(route)
-    );
-
-    if (isLoginPage) {
-      if (isAuth) {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
-      }
-
-      return NextResponse.next();
-    }
-
-    if (!isAuth && isAccessingSensitiveRoute) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-
-    if (pathname === "/") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
-  },
-  {
-    callbacks: {
-      async authorized() {
-        return true;
-      },
-    },
-  }
-);
-
+import { authMiddleware } from "@clerk/nextjs";
+ 
+// This example protects all routes including api/trpc routes
+// Please edit this to allow other routes to be public as needed.
+// See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your middleware
+export default authMiddleware({});
+ 
 export const config = {
-  matchter: ["/", "/login", "/dashboard/:path*"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
+ 

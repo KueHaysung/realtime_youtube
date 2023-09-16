@@ -1,14 +1,8 @@
-import { createAppointmentValidator } from "@/lib/validations/create-appointment";
-import { fetchRedis } from "@/helpers/redis";
-import { pusherServer } from "@/lib/pusher";
-import { toPusherKey } from "@/lib/utils";
 import { nanoid } from "nanoid";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
+import getUser from "@/lib/getUser";
 export async function POST(req: Request) {
-
   try {
     const body = await req.json();
     const {
@@ -29,14 +23,13 @@ export async function POST(req: Request) {
       describe: string;
     } = body;
     console.log("startTime2:", startTime);
-  
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const user = await getUser();
+    if (!user) {
       return new Response("Unauthorized", { status: 401 });
     }
     const appointment: Appointment = {
       id: nanoid(),
-      memberId: [session.user.id],
+      memberId: [user.id],
       startTime: new Date(startTime).getTime(),
       endTime: new Date(endTime).getTime(),
       selectedGames: gameType,
@@ -54,8 +47,11 @@ export async function POST(req: Request) {
     //   }
     // );
 
-    await db.sadd(`appointment:${appointment.id}:incoming_appointment`,appointment);
-    await db.sadd(`incoming_appointment`,appointment.id);
+    await db.sadd(
+      `appointment:${appointment.id}:incoming_appointment`,
+      appointment
+    );
+    await db.sadd(`incoming_appointment`, appointment.id);
     return new Response("OK");
   } catch (error) {
     if (error instanceof z.ZodError) {

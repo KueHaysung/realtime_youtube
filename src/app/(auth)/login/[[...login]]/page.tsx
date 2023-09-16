@@ -1,38 +1,41 @@
-"use client";
-import { FC, useRef, useState } from "react";
-import Button from "@/components/ui/Button";
-import { signIn } from "next-auth/react";
-import { toast } from "react-hot-toast";
+import { FC } from "react";
+import { SignIn } from "@clerk/nextjs";
 interface pageProps {}
 const Page: FC<pageProps> = ({}) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  async function loginWithGoogle() {
-    setIsLoading(true);
-    try {
-      await signIn("google");
-    } catch {
-      toast.error("Something wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-  async function loginWithEmail() {
-    setIsLoading(true);
-    // console.log(GetSearchVal);
-    try {
-      await signIn("email", {
-        email: "1424438786@qq.com",
-      });
-    } catch {
-      toast.error("Something wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
+  // async function loginWithGoogle() {
+  //   setIsLoading(true);
+  //   try {
+  //     await signIn("google");
+  //   } catch {
+  //     toast.error("Something wrong");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }
+  // async function loginWithEmail() {
+  //   setIsLoading(true);
+  //   // console.log(GetSearchVal);
+  //   try {
+  //     await signIn("email", {
+  //       email: "1424438786@qq.com",
+  //     });
+  //   } catch {
+  //     toast.error("Something wrong");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }
 
   return (
     <>
-      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className=" relative">
+        <div className="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[50%]">
+          <SignIn />
+        </div>
+      </div>
+
+      {/* <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full flex flex-col items-center max-w-md space-y-8">
           <div className=" flex flex-col items-center gap-8">
             logo
@@ -85,7 +88,7 @@ const Page: FC<pageProps> = ({}) => {
             Email
           </Button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

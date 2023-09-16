@@ -2,7 +2,7 @@
 import { FC, useState } from "react";
 import Button from "@/components/ui/Button";
 import axios, { AxiosError } from "axios";
-import {  z } from "zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -23,12 +23,13 @@ const formInfos = [
 
 // type FormType = (typeof formInfos)[number];
 
-type FormData = z.infer<typeof createAppointmentValidator> ;
+type FormData = z.infer<typeof createAppointmentValidator>;
 // const games=Object.keys(Games1)
 // console.log(games)
 const games = Object.keys(Games1).filter((item) => isNaN(Number(item)));
 const CreateGame: FC<CreateGameProps> = ({}) => {
   const [showSuccessState, setShowSuccessState] = useState<boolean>(false);
+  const [hadSent, setHadSent] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -38,13 +39,11 @@ const CreateGame: FC<CreateGameProps> = ({}) => {
     resolver: zodResolver(createAppointmentValidator as any),
   });
   const createAppointment = async (app: FormData) => {
-    console.log("开始添加数据")
- 
+    console.log("开始添加数据");
+
     try {
-      const validAppointment = createAppointmentValidator.parse( app );
-      await axios.post("/api/games/create", 
-        validAppointment
-      );
+      const validAppointment = createAppointmentValidator.parse(app);
+      await axios.post("/api/games/create", validAppointment);
       setShowSuccessState(true);
     } catch (error) {
       console.log(error);
@@ -60,9 +59,11 @@ const CreateGame: FC<CreateGameProps> = ({}) => {
       setError("root", { message: "Something went wrong." });
     }
   };
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
+    if (showSuccessState) setHadSent(true);
+    if (hadSent) return;
     console.log(data);
-    createAppointment(data);
+    await createAppointment(data);
   };
 
   return (
@@ -126,7 +127,13 @@ const CreateGame: FC<CreateGameProps> = ({}) => {
       <Button>创建</Button>
 
       {showSuccessState ? (
-        <p className="mt-1 text-sm text-green-600">创建成功!</p>
+        hadSent ? (
+          <p className="mt-1 text-sm text-red-600">
+            已经创建成功，请勿重复提交
+          </p>
+        ) : (
+          <p className="mt-1 text-sm text-green-600">创建成功!</p>
+        )
       ) : null}
     </form>
   );
