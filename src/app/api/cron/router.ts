@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST() {
   try {
     await db.set("lastTime", Date.now());
   } catch (e) {
