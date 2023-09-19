@@ -5,7 +5,7 @@ import { authMiddleware } from "@clerk/nextjs";
 // See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your middleware
 export default authMiddleware({
   //设置api下所有文件及隶属文件路径为公开路由
-  publicRoutes: ["/api/cron", "/api/cron/*"],
+  publicRoutes: ["/api/(.*)"],
 });
  
 export const config = {
