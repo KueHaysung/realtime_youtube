@@ -1,6 +1,6 @@
 import {FC} from 'react'
 interface pageProps{}
 const page:FC<pageProps>=({})=>{
-  return <div>page</div>
+  return <div>page1</div>
 }
 export default page
