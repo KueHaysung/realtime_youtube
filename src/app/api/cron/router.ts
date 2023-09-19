@@ -1,6 +1,6 @@
-import cron from "node-cron";
+
 import { db } from "@/lib/db";
-import App from "next/app";
+
 import { NextResponse } from 'next/server';
 
 export async function GET() {

@@ -1,5 +1,5 @@
 "use client";
-import { pusherClient, pusherServer } from "@/lib/pusher";
+import { pusherClient } from "@/lib/pusher";
 import { cn, toPusherKey } from "@/lib/utils";
 import { Message } from "@/lib/validations/message";
 import { format } from "date-fns";
@@ -10,10 +10,7 @@ import { toast } from "react-hot-toast";
 import {
   Menu,
   Item,
-  Separator,
-  Submenu,
   useContextMenu,
-  TriggerEvent,
 } from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
 const MENU_ID = "menu-id";
