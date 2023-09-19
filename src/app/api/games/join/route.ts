@@ -19,7 +19,6 @@ export async function POST(req: Request) {
     return new Response("Already Join", { status: 400 });
   }
   appointmentParsed.memberId.push(user.id);
-  console.log("newapp:", appointmentParsed);
   try {
     await db.spop(`appointment:${id}:incoming_appointment`);
     await db.sadd(`appointment:${id}:incoming_appointment`, appointmentParsed);
